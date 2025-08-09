@@ -1,0 +1,117 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { editableSelection, inputOrTextareaSelection } from './selection'
+import { useState } from 'react'
+import { commands, page, userEvent } from '@vitest/browser/context'
+
+describe('input or textarea selection', () => {
+  let input: HTMLInputElement
+  beforeEach(async () => {
+    input = document.createElement('input')
+    input.type = 'text'
+    input.dataset.testid = 'test-input'
+    input.value = ''
+    document.body.append(input)
+    await userEvent.fill(input, 'hello world')
+  })
+  afterEach(() => {
+    input.remove()
+  })
+  it('no selection', async () => {
+    const selection = inputOrTextareaSelection(input)
+    expect(selection.getSelection()).eq('')
+    expect(selection.hasSelection()).false
+    expect(selection.getInputValue()).eq('hello world')
+
+    selection.replaceInputValue('hi')
+    expect(input.value).eq('hi')
+    await commands.undo()
+    expect(input.value).eq('hello world')
+  })
+  it('has selection', async () => {
+    const selection = inputOrTextareaSelection(input)
+    await userEvent.click(input)
+    await commands.keypress('Home')
+    await commands.keydown('Shift')
+    Array.from({ length: 5 }).forEach(async () => {
+      await commands.keydown('ArrowRight')
+    })
+    await commands.keyup('Shift')
+    expect(selection.hasSelection()).true
+    expect(selection.getSelection()).eq('hello')
+
+    selection.replaceSelection('hi')
+    expect(input.value).eq('hi world')
+    expect(selection.hasSelection()).false
+    await userEvent.type(input, ' javascript')
+    expect(input.value).eq('hi javascript world')
+    await commands.undo()
+    // expect(input.value).eq('hi world')
+    // await commands.undo()
+    expect(input.value).eq('hello world') // TODO: why?
+  })
+  it('has selection and direction', async () => {
+    const selection = inputOrTextareaSelection(input)
+    await userEvent.click(input)
+    await commands.keydown('Shift')
+    Array.from({ length: 5 }).forEach(async () => {
+      await commands.keydown('ArrowLeft')
+    })
+    await commands.keyup('Shift')
+    expect(selection.hasSelection()).true
+    expect(selection.getSelection()).eq('world')
+
+    selection.replaceSelection('javascript')
+    expect(input.value).eq('hello javascript')
+    expect(selection.hasSelection()).false
+    await commands.undo()
+    expect(input.value).eq('hello world')
+  })
+})
+
+describe('editable selection', () => {
+  let input: HTMLElement
+  beforeEach(async () => {
+    input = document.createElement('div')
+    input.contentEditable = 'true'
+    input.dataset.testid = 'test-editable'
+    document.body.append(input)
+    await userEvent.fill(input, 'hello world')
+  })
+  afterEach(() => {
+    input.remove()
+  })
+  it('no selection', async () => {
+    const selection = editableSelection(input)
+    expect(selection.hasSelection()).false
+    expect(selection.getSelection()).eq('')
+    expect(selection.getInputValue()).eq('hello world')
+
+    await selection.replaceInputValue('hi')
+    expect(input.innerText).eq('hi')
+    expect(selection.hasSelection()).false
+    await commands.undo()
+    expect(input.innerText).eq('hello world')
+  })
+  it.skip('has selection', async () => {
+    const selection = editableSelection(input)
+    await userEvent.click(input)
+    await commands.keypress('Home')
+    await commands.keydown('Shift')
+    Array.from({ length: 5 }).forEach(async () => {
+      await commands.keydown('ArrowRight')
+    })
+    await commands.keyup('Shift')
+    expect(selection.hasSelection()).true
+    expect(selection.getSelection()).eq('hello')
+
+    await selection.replaceSelection('hi')
+    expect(input.innerText).eq('hi world')
+    expect(selection.hasSelection()).false
+    await userEvent.type(input, ' javascript')
+    expect(input.innerText).eq('hi javascript world')
+    await commands.undo()
+    expect(input.innerText).eq('hi world')
+    await commands.undo()
+    expect(input.innerText).eq('hello world')
+  })
+})

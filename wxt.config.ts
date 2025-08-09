@@ -15,9 +15,8 @@ export default defineConfig({
   manifest: (env) => {
     const manifest: UserManifest = {
       name: 'Input Translator',
-      description:
-        'A template for WXT, a WebExtension framework based on Vite and React',
-      permissions: ['storage'],
+      description: 'Translate input or selected text and copy to clipboard.',
+      permissions: ['contextMenus', 'storage'],
       host_permissions: ['<all_urls>'],
       author: {
         email: 'rxliuli@gmail.com',
@@ -31,12 +30,22 @@ export default defineConfig({
           '128': 'icon/128.png',
         },
       },
+      commands: {
+        translate: {
+          suggested_key: {
+            default: 'Alt+T',
+          },
+          description:
+            'Translate input or selected text and copy to clipboard.',
+        },
+      },
       homepage_url: 'https://rxliuli.com/projects/input-translator',
     }
     if (env.browser === 'firefox') {
       manifest.browser_specific_settings = {
         gecko: {
-          id: manifest.name!.toLowerCase().replaceAll(' ', '-') + '@rxliuli.com',
+          id:
+            manifest.name!.toLowerCase().replaceAll(' ', '-') + '@rxliuli.com',
         },
       }
       // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/author

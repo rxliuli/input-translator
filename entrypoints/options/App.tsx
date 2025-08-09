@@ -3,7 +3,7 @@ import { ThemeProvider } from '@/integrations/theme/ThemeProvider'
 import { Toaster } from 'sonner'
 import { IndexPage } from './pages/IndexPage'
 
-function App(props: { container: HTMLElement }) {
+export function App(props: { container: HTMLElement }) {
   return (
     <ShadowProvider container={props.container}>
       <ThemeProvider>
@@ -13,5 +13,3 @@ function App(props: { container: HTMLElement }) {
     </ShadowProvider>
   )
 }
-
-export default App

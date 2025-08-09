@@ -14,7 +14,7 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: (env) => {
     const manifest: UserManifest = {
-      name: 'Browser Extension Template',
+      name: 'Input Translator',
       description:
         'A template for WXT, a WebExtension framework based on Vite and React',
       permissions: ['storage'],
@@ -31,7 +31,7 @@ export default defineConfig({
           '128': 'icon/128.png',
         },
       },
-      homepage_url: 'https://rxliuli.com/projects/browser-extension-template',
+      homepage_url: 'https://rxliuli.com/projects/input-translator',
     }
     if (env.browser === 'firefox') {
       manifest.browser_specific_settings = {

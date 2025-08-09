@@ -9,12 +9,12 @@ dotenv.config({ path: path.resolve(rootPath, '.env.local') })
 // https://github.com/vitejs/vite/issues/5885
 process.env.NODE_ENV = 'production'
 
-const ProjectName = 'Browser Extension Template'
+const ProjectName = 'Input Translator'
 const AppCategory = 'public.app-category.productivity'
 const DevelopmentTeam = process.env.DEVELOPMENT_TEAM
 
 await $`pnpm wxt build -b safari`
-await $`xcrun safari-web-extension-converter --bundle-identifier com.rxliuli.browser-extension-template --force --project-location .output .output/safari-mv3`
+await $`xcrun safari-web-extension-converter --bundle-identifier com.rxliuli.input-translator --force --project-location .output .output/safari-mv3`
 async function updateProjectConfig() {
   const projectConfigPath = path.resolve(
     rootPath,

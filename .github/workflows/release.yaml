@@ -1,6 +1,6 @@
 env:
   DIRECTORY: .output
-  PROJECT_NAME: browser-extension-template
+  PROJECT_NAME: input-translator
 
 name: Release
 

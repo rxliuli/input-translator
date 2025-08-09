@@ -15,7 +15,7 @@ export default defineConfig({
   manifest: (env) => {
     const manifest: UserManifest = {
       name: 'Input Translator',
-      description: 'Translate input or selected text and copy to clipboard.',
+      description: 'Translate your input text with AI.',
       permissions: ['contextMenus', 'storage'],
       host_permissions: ['<all_urls>'],
       author: {

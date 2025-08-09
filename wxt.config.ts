@@ -35,8 +35,7 @@ export default defineConfig({
           suggested_key: {
             default: 'Alt+T',
           },
-          description:
-            'Translate input or selected text and copy to clipboard.',
+          description: 'Translate your input text with AI.',
         },
       },
       homepage_url: 'https://rxliuli.com/projects/input-translator',

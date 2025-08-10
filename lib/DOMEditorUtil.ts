@@ -9,3 +9,16 @@ export function getSelect(): string | null {
 export async function writeClipboard(text: string) {
   await navigator.clipboard.writeText(text)
 }
+
+export function getActiveElement(): HTMLElement | null {
+  const element = document.activeElement as HTMLElement
+  const shadowRoot = element.shadowRoot
+  if (!shadowRoot) {
+    return element
+  }
+  const shadowElement = shadowRoot.activeElement as HTMLElement
+  if (!shadowElement) {
+    return element
+  }
+  return shadowElement
+}

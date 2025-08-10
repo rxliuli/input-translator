@@ -64,7 +64,7 @@ Download from [Chrome Web Store](https://chromewebstore.google.com/detail/namibp
 
 ## License
 
-MIT
+GPL-3.0
 
 ---
 

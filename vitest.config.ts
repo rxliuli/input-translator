@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { readFile } from 'fs/promises'
-import { BrowserCommands, locators } from '@vitest/browser/context'
+import { BrowserCommands } from '@vitest/browser/context'
 import { BrowserCommandContext } from 'vitest/node'
 
 type CustomCommand<K extends keyof BrowserCommands> = (

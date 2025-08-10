@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { editableSelection, inputOrTextareaSelection } from './selection'
+import {
+  editableSelection,
+  inputOrTextareaSelection,
+  tryExecCommandInsertText,
+} from './selection'
 import { useState } from 'react'
 import { commands, page, userEvent } from '@vitest/browser/context'
+import { getSelect } from './DOMEditorUtil'
 
 describe('input or textarea selection', () => {
   let input: HTMLInputElement
@@ -113,5 +118,63 @@ describe('editable selection', () => {
     expect(input.innerText).eq('hi world')
     await commands.undo()
     expect(input.innerText).eq('hello world')
+  })
+})
+
+describe('tryExecCommandInsertText', () => {
+  describe('input', () => {
+    let input: HTMLInputElement
+    beforeEach(async () => {
+      input = document.createElement('input')
+      input.type = 'text'
+      input.dataset.testid = 'test-input'
+      input.value = ''
+      document.body.append(input)
+      await userEvent.fill(input, 'hello world')
+    })
+    afterEach(() => {
+      input.remove()
+    })
+    it('replace all text', async () => {
+      await tryExecCommandInsertText('hi', input, 100)
+      expect(input.value).eq('hi')
+    })
+    it('replace selected text', async () => {
+      await commands.keypress('Home')
+      await commands.keydown('Shift')
+      for (let i = 0; i < 5; i++) {
+        await commands.keydown('ArrowRight')
+      }
+      await commands.keyup('Shift')
+      await tryExecCommandInsertText('hi', input, 100)
+      expect(input.value).eq('hi world')
+    })
+  })
+  describe('editable', () => {
+    let input: HTMLElement
+    beforeEach(async () => {
+      input = document.createElement('div')
+      input.contentEditable = 'true'
+      input.dataset.testid = 'test-editable'
+      document.body.append(input)
+      await userEvent.fill(input, 'hello world')
+    })
+    afterEach(() => {
+      input.remove()
+    })
+    it('replace all text', async () => {
+      await tryExecCommandInsertText('hi', input, 100)
+      expect(input.innerText).eq('hi')
+    })
+    it('replace selected text', async () => {
+      await commands.keypress('Home')
+      await commands.keydown('Shift')
+      for (let i = 0; i < 5; i++) {
+        await commands.keydown('ArrowRight')
+      }
+      await commands.keyup('Shift')
+      await tryExecCommandInsertText('hi', input, 100)
+      expect(input.innerText).eq('hi world')
+    })
   })
 })

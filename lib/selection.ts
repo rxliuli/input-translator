@@ -1,3 +1,5 @@
+import { getSelect } from './DOMEditorUtil'
+
 interface Selection {
   hasSelection: () => boolean
 
@@ -118,17 +120,20 @@ async function tryPaste(text: string, el: Element, stepDelayMs: number) {
   }
 }
 
-async function tryExecCommandInsertText(
+export async function tryExecCommandInsertText(
   text: string,
   el: Element,
   stepDelayMs: number,
 ) {
   const doc = el.ownerDocument || document
   try {
-    if (isInputOrTextarea(el) && el.value) {
-      el.select()
-    } else if (!isInputOrTextarea(el)) {
-      selectAll(el)
+    const selected = getSelect()
+    if (!selected) {
+      if (isInputOrTextarea(el) && el.value) {
+        el.select()
+      } else if (!isInputOrTextarea(el)) {
+        selectAll(el)
+      }
     }
     // 有些浏览器不再推荐 execCommand，但仍兼容
     // 插入时将 \n 替换为 \r 与原实现一致（有些输入控件依赖此行为）
@@ -139,7 +144,11 @@ async function tryExecCommandInsertText(
     // 兜底：对 input/textarea，直接赋值
     if (isInputOrTextarea(el)) {
       if (el.value !== text) {
-        el.value = text
+        if (selected) {
+          el.value = el.value.replace(selected, text)
+        } else {
+          el.value = text
+        }
         dispatchInput(el)
       }
     }

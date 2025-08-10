@@ -10,15 +10,19 @@ export async function writeClipboard(text: string) {
   await navigator.clipboard.writeText(text)
 }
 
-export function getActiveElement(): HTMLElement | null {
-  const element = document.activeElement as HTMLElement
+export function getActiveElement(
+  element: HTMLElement | null = document.activeElement as HTMLElement,
+): HTMLElement | null {
+  if (!element) {
+    return null
+  }
   const shadowRoot = element.shadowRoot
   if (!shadowRoot) {
     return element
   }
-  const shadowElement = shadowRoot.activeElement as HTMLElement
+  const shadowElement = shadowRoot.activeElement as HTMLElement | null
   if (!shadowElement) {
     return element
   }
-  return shadowElement
+  return getActiveElement(shadowElement)
 }

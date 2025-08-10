@@ -6,6 +6,7 @@ import {
 import { InputLoader } from '@/lib/loading'
 import { messaging } from '@/lib/messaging'
 import { getEditSelection, isInputElement } from '@/lib/selection'
+import { UniversalSpaceDetector } from '@/lib/UniversalSpaceDetector'
 
 export default defineContentScript({
   matches: ['<all_urls>'],
@@ -53,29 +54,6 @@ export default defineContentScript({
       }
     }
 
-    let spaceCount = 0
-    let lastSpaceTime = 0
-    const SPACE_THRESHOLD = 500
-    document.addEventListener(
-      'keydown',
-      async (event) => {
-        if (event.code !== 'Space') {
-          return
-        }
-        const currentTime = Date.now()
-        if (currentTime - lastSpaceTime > SPACE_THRESHOLD) {
-          spaceCount = 0
-        }
-        spaceCount++
-        lastSpaceTime = currentTime
-        if (spaceCount < 3) {
-          return
-        }
-        lastSpaceTime = 0
-        spaceCount = 0
-        await triggerTranslate()
-      },
-      true,
-    )
+    new UniversalSpaceDetector(triggerTranslate)
   },
 })

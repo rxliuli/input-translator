@@ -51,10 +51,15 @@ export const openai: Translator = {
     if (!settings.prompt) {
       throw new Error('OpenAI prompt is not set')
     }
-    if (newModels.includes(settings.model)) {
-      return sendOfResponse(text, settings)
+    const prompt =
+      settings.prompt.replaceAll('{to}', options.to) + '\n\n' + text.trimEnd()
+    if (
+      settings.baseUrl === 'https://api.openai.com/v1' &&
+      newModels.includes(settings.model)
+    ) {
+      return sendOfResponse(prompt, settings)
     }
-    return sendOfCompletion(text, settings)
+    return sendOfCompletion(prompt, settings)
   },
 }
 
@@ -67,7 +72,7 @@ async function sendOfResponse(text: string, options: Settings) {
     },
     body: JSON.stringify({
       model: options.model,
-      input: options.prompt + '\n\n' + text,
+      input: text,
     }),
   })
   if (!r.ok) {
@@ -78,7 +83,7 @@ async function sendOfResponse(text: string, options: Settings) {
 }
 
 async function sendOfCompletion(text: string, options: Settings) {
-  const r = await fetch(`${options.baseUrl}/completions`, {
+  const r = await fetch(`${options.baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -89,7 +94,7 @@ async function sendOfCompletion(text: string, options: Settings) {
       messages: [
         {
           role: 'user',
-          content: options.prompt + '\n\n' + text,
+          content: text,
         },
       ],
     }),

@@ -35,7 +35,6 @@ export class UniversalSpaceDetector {
     document.addEventListener(
       'keydown',
       (e) => {
-        console.log('keydown', e.key)
         if (e.key === ' ') {
           this.handleSpace(e)
         }
@@ -48,7 +47,12 @@ export class UniversalSpaceDetector {
     document.addEventListener(
       'beforeinput',
       (e) => {
-        if (e.data === ' ') {
+        const spaceVariants = [
+          '\u0020', // Space
+          '\u3000', // Ideographic Space - CJK
+          '\u00A0', // Non-breaking Space - French
+        ]
+        if (e.data && spaceVariants.includes(e.data)) {
           this.handleSpace(e)
         }
       },

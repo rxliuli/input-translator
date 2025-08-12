@@ -48,4 +48,17 @@ describe('UniversalSpaceDetector mobile', () => {
     await userEvent.type(input, ' ')
     expect(callback).toHaveBeenCalledTimes(1)
   })
+  it('should detect 3 cjk spaces', async () => {
+    const callback = vi.fn()
+    const CJKSpace = '　'
+    new UniversalSpaceDetector(callback)
+    await userEvent.type(input, CJKSpace)
+    expect(callback).toHaveBeenCalledTimes(0)
+    await userEvent.type(input, CJKSpace)
+    expect(callback).toHaveBeenCalledTimes(0)
+    await userEvent.type(input, CJKSpace)
+    expect(callback).toHaveBeenCalledTimes(1)
+    await userEvent.type(input, CJKSpace)
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
 })

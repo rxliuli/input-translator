@@ -3,6 +3,7 @@ export class InputLoader {
   constructor() {
     this.loaderElement = null
     this.styleElement = null
+    this.isVisible = false
     this.initStyles()
   }
 
@@ -388,6 +389,7 @@ export class InputLoader {
     // 保存元素引用
     this.currentElement = element
     this.isCurrentContentEditable = isContentEditable
+    this.isVisible = true
   }
 
   updatePosition(element, options = {}) {
@@ -454,6 +456,8 @@ export class InputLoader {
       this.loaderElement = null
     }
 
+    this.isVisible = false
+
     if (this.currentElement && this.inputListener) {
       if (this.isCurrentContentEditable) {
         this.currentElement.removeEventListener('input', this.inputListener)
@@ -491,5 +495,11 @@ export class InputLoader {
       this.styleElement.remove()
       this.styleElement = null
     }
+    this.isVisible = false
+  }
+
+  // 获取当前是否显示 loading 的状态
+  get visible() {
+    return this.isVisible
   }
 }

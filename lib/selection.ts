@@ -166,6 +166,35 @@ export function editableSelection(element: HTMLElement): Selection {
     return selection?.toString() || ''
   }
 
+  async function checkWriteSuccess(tryFn: () => Promise<void>, text: string) {
+    const beforeContent = getInputValue()
+    await tryFn()
+    const afterContent = getInputValue()
+    if (afterContent.includes(text)) {
+      return true
+    }
+    // Check if content has changed, likely successful despite formatting differences
+    if (
+      afterContent !== beforeContent &&
+      afterContent.trim() !== beforeContent.trim()
+    ) {
+      console.debug(
+        'Content changed, likely successful despite formatting differences',
+      )
+      return true
+    }
+
+    // normalize
+    const normalizeText = (str: string) => str.replace(/\s+/g, ' ').trim()
+    const normalizedAfter = normalizeText(afterContent)
+    const normalizedText = normalizeText(text)
+
+    if (normalizedAfter.includes(normalizedText)) {
+      console.debug('Text found after normalization')
+      return true
+    }
+  }
+
   const replaceSelection = async (
     text: string,
     all = false,
@@ -185,13 +214,16 @@ export function editableSelection(element: HTMLElement): Selection {
     if (all) {
       selectAll(element)
     }
-    await tryPaste(text, element, 100)
-    if (getInputValue().includes(text)) {
+    if (await checkWriteSuccess(() => tryPaste(text, element, 100), text)) {
       return true
     }
     // try command
-    await tryExecCommandInsertText(text, element, 100)
-    if (getInputValue().includes(text)) {
+    if (
+      await checkWriteSuccess(
+        () => tryExecCommandInsertText(text, element, 100),
+        text,
+      )
+    ) {
       return true
     }
     return false

@@ -4,9 +4,7 @@ import {
   inputOrTextareaSelection,
   tryExecCommandInsertText,
 } from './selection'
-import { useState } from 'react'
-import { commands, page, userEvent } from '@vitest/browser/context'
-import { getSelect } from './DOMEditorUtil'
+import { commands, userEvent } from '@vitest/browser/context'
 
 describe('input or textarea selection', () => {
   let input: HTMLInputElement
@@ -118,6 +116,32 @@ describe('editable selection', () => {
     expect(input.innerText).eq('hi world')
     await commands.undo()
     expect(input.innerText).eq('hello world')
+  })
+  it('auto change on paste', async () => {
+    const selection = editableSelection(input)
+    await userEvent.click(input)
+    await userEvent.fill(input, '')
+    expect(input.innerText.trim()).eq('')
+    input.addEventListener('paste', (ev) => {
+      const str = ev.clipboardData?.getData('text/plain')
+      if (!str) {
+        return
+      }
+      ev.preventDefault()
+      document.execCommand('insertText', false, str.repeat(2))
+    })
+    await userEvent.paste()
+    await selection.replaceInputValue('hello')
+    expect(input.innerText).eq('hellohello')
+
+    await commands.keypress('Home')
+    await commands.keydown('Shift')
+    Array.from({ length: 5 }).forEach(async () => {
+      await commands.keydown('ArrowRight')
+    })
+    await commands.keyup('Shift')
+    await selection.replaceSelection('world')
+    expect(input.innerText).eq('worldworldhello')
   })
 })
 

@@ -17,6 +17,10 @@ export default defineContentScript({
 
     const loader = new InputLoader()
     async function triggerTranslate() {
+      if (loader.visible) {
+        console.debug('Loader is already visible, skipping translation')
+        return
+      }
       try {
         const activeElement = getActiveElement()
         loader.show(activeElement)

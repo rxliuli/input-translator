@@ -10,6 +10,7 @@ import { UniversalSpaceDetector } from '@/lib/UniversalSpaceDetector'
 
 export default defineContentScript({
   matches: ['<all_urls>'],
+  allFrames: true,
   main: () => {
     messaging.onMessage('getSelect', getSelect)
     messaging.onMessage('writeClipboard', (ev) => writeClipboard(ev.data))
@@ -21,13 +22,23 @@ export default defineContentScript({
         console.debug('Loader is already visible, skipping translation')
         return
       }
+
       try {
         const activeElement = getActiveElement()
-        loader.show(activeElement)
+        if (activeElement instanceof HTMLIFrameElement) {
+          console.debug('Active element is an iframe, skipping translation')
+          return
+        }
         if (!activeElement || !isInputElement(activeElement)) {
+          if (top !== window) {
+            console.debug('Active element is not in the iframe, skipping translation')
+            return
+          }
+          console.log('No active element', location.href)
           alert('No active element')
           return
         }
+        loader.show(activeElement)
         const selection = getEditSelection(activeElement)
         const textToTranslate = selection.hasSelection()
           ? selection.getSelection()

@@ -170,6 +170,9 @@ export function editableSelection(element: HTMLElement): Selection {
     const beforeContent = getInputValue()
     await tryFn()
     const afterContent = getInputValue()
+    if (afterContent.trim().length === 0) {
+      return false
+    }
     if (afterContent.includes(text)) {
       return true
     }

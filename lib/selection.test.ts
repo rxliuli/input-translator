@@ -143,6 +143,20 @@ describe('editable selection', () => {
     await selection.replaceSelection('world')
     expect(input.innerText).eq('worldworldhello')
   })
+  it('custom paste event listener', async () => {
+    const selection = editableSelection(input)
+    input.addEventListener('paste', (ev) => {
+      if (!ev.isTrusted) {
+        // example: https://gemini.google.com/app
+        input.textContent = ''
+      }
+    })
+    expect(selection.getInputValue()).eq('hello world')
+    await selection.replaceInputValue('hi')
+    expect(input.innerText).eq('hi')
+  })
+  // https://quilljs.com/
+  it.todo('quill editor')
 })
 
 describe('tryExecCommandInsertText', () => {

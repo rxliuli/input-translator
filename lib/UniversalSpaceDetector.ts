@@ -4,7 +4,7 @@ export class UniversalSpaceDetector {
   private lastSpaceTime: number
   private TIMEOUT: number
 
-  constructor(private readonly callback: (event: Event) => void) {
+  constructor(private readonly callback: () => void) {
     this.isMobile = this.detectMobile()
     this.spaceCount = 0
     this.lastSpaceTime = 0
@@ -35,9 +35,7 @@ export class UniversalSpaceDetector {
     document.addEventListener(
       'keydown',
       (e) => {
-        if (e.key === ' ') {
-          this.handleSpace(e)
-        }
+        this.handleSpace(e.key)
       },
       true,
     )
@@ -47,20 +45,22 @@ export class UniversalSpaceDetector {
     document.addEventListener(
       'beforeinput',
       (e) => {
-        const spaceVariants = [
-          '\u0020', // Space
-          '\u3000', // Ideographic Space - CJK
-          '\u00A0', // Non-breaking Space - French
-        ]
-        if (e.data && spaceVariants.includes(e.data)) {
-          this.handleSpace(e)
-        }
+        this.handleSpace(e.data)
       },
       true,
     )
   }
 
-  private handleSpace(e: InputEvent | KeyboardEvent) {
+  private handleSpace(key: string | null) {
+    const spaceVariants = [
+      '\u0020', // Space
+      '\u3000', // Ideographic Space - CJK
+      '\u00A0', // Non-breaking Space - French
+    ]
+    if (!key || !spaceVariants.includes(key)) {
+      this.spaceCount = 0
+      return
+    }
     const now = Date.now()
     if (now - this.lastSpaceTime > this.TIMEOUT) {
       this.spaceCount = 1
@@ -73,6 +73,6 @@ export class UniversalSpaceDetector {
     }
     this.lastSpaceTime = 0
     this.spaceCount = 0
-    this.callback(e)
+    this.callback()
   }
 }

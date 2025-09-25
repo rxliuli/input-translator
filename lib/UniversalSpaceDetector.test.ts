@@ -28,6 +28,19 @@ describe('UniversalSpaceDetector desktop', () => {
     await userEvent.type(input, ' ')
     expect(callback).toHaveBeenCalledTimes(1)
   })
+  it('should not detect if 3 spaces with other characters in between', async () => {
+    const callback = vi.fn()
+    new UniversalSpaceDetector(callback)
+    await userEvent.type(input, ' ')
+    await userEvent.type(input, ' ')
+    await userEvent.type(input, 'k')
+    await userEvent.type(input, ' ')
+    expect(callback).toHaveBeenCalledTimes(0)
+    await userEvent.type(input, ' ')
+    await userEvent.type(input, ' ')
+    await userEvent.type(input, ' ')
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
 })
 
 describe('UniversalSpaceDetector mobile', () => {

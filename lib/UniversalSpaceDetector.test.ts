@@ -41,6 +41,40 @@ describe('UniversalSpaceDetector desktop', () => {
     await userEvent.type(input, ' ')
     expect(callback).toHaveBeenCalledTimes(1)
   })
+  it('should not detect if space typed outside input', async () => {
+    const callback = vi.fn()
+    new UniversalSpaceDetector(callback)
+    input.blur()
+    await commands.keypress(' ')
+    await commands.keypress(' ')
+    await commands.keypress(' ')
+    expect(callback).toHaveBeenCalledTimes(0)
+  })
+  it('should detect if space typed inside shadow dom input', async () => {
+    const callback = vi.fn()
+    new UniversalSpaceDetector(callback)
+    const host = document.createElement('div')
+    const shadow = host.attachShadow({ mode: 'open' })
+    const shadowInput = document.createElement('input')
+    shadowInput.type = 'text'
+    shadowInput.value = ''
+    const shadowButton = document.createElement('button')
+    shadowButton.textContent = 'Click me'
+    shadow.append(shadowInput)
+    shadow.append(shadowButton)
+    document.body.append(host)
+    await userEvent.fill(shadowInput, 'hello world')
+    await userEvent.type(shadowInput, ' ')
+    await userEvent.type(shadowInput, ' ')
+    await userEvent.type(shadowInput, ' ')
+    expect(callback).toHaveBeenCalledTimes(1)
+    shadowInput.blur()
+    await userEvent.type(document.body, ' ')
+    await userEvent.type(document.body, ' ')
+    await userEvent.type(document.body, ' ')
+    expect(callback).toHaveBeenCalledTimes(1)
+    host.remove()
+  })
 })
 
 describe('UniversalSpaceDetector mobile', () => {

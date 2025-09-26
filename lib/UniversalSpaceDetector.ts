@@ -1,3 +1,5 @@
+import { getActiveElement, isInputElement } from './selection'
+
 export class UniversalSpaceDetector {
   private isMobile: boolean
   private spaceCount: number
@@ -35,7 +37,7 @@ export class UniversalSpaceDetector {
     document.addEventListener(
       'keydown',
       (e) => {
-        this.handleSpace(e.key)
+        this.handleSpace(e, e.key)
       },
       true,
     )
@@ -45,13 +47,21 @@ export class UniversalSpaceDetector {
     document.addEventListener(
       'beforeinput',
       (e) => {
-        this.handleSpace(e.data)
+        this.handleSpace(e, e.data)
       },
       true,
     )
   }
 
-  private handleSpace(key: string | null) {
+  private handleSpace(e: KeyboardEvent | InputEvent, key: string | null) {
+    if (
+      e.target !== null &&
+      e.target instanceof HTMLElement &&
+      !isInputElement(getActiveElement(e.target))
+    ) {
+      this.spaceCount = 0
+      return
+    }
     const spaceVariants = [
       '\u0020', // Space
       '\u3000', // Ideographic Space - CJK

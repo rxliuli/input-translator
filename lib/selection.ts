@@ -1,5 +1,3 @@
-import { getSelect } from './DOMEditorUtil'
-
 interface Selection {
   hasSelection: () => boolean
 
@@ -263,4 +261,33 @@ export function getEditSelection(element: HTMLElement): Selection {
     return inputOrTextareaSelection(element)
   }
   return editableSelection(element)
+}
+
+export function getSelect(): string | null {
+  const selection = getSelection()
+  if (!selection || selection.type === 'None') {
+    return null
+  }
+  return selection.toString()
+}
+
+export async function writeClipboard(text: string) {
+  await navigator.clipboard.writeText(text)
+}
+
+export function getActiveElement(
+  element: HTMLElement | null = document.activeElement as HTMLElement,
+): HTMLElement | null {
+  if (!element) {
+    return null
+  }
+  const shadowRoot = element.shadowRoot
+  if (!shadowRoot) {
+    return element
+  }
+  const shadowElement = shadowRoot.activeElement as HTMLElement | null
+  if (!shadowElement) {
+    return element
+  }
+  return getActiveElement(shadowElement)
 }

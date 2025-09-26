@@ -1,11 +1,12 @@
-import {
-  getActiveElement,
-  getSelect,
-  writeClipboard,
-} from '@/lib/DOMEditorUtil'
 import { InputLoader } from '@/lib/loading'
 import { messaging } from '@/lib/messaging'
-import { getEditSelection, isInputElement } from '@/lib/selection'
+import {
+  getActiveElement,
+  getEditSelection,
+  getSelect,
+  isInputElement,
+  writeClipboard,
+} from '@/lib/selection'
 import { UniversalSpaceDetector } from '@/lib/UniversalSpaceDetector'
 
 export default defineContentScript({
@@ -31,7 +32,9 @@ export default defineContentScript({
         }
         if (!activeElement || !isInputElement(activeElement)) {
           if (top !== window) {
-            console.debug('Active element is not in the iframe, skipping translation')
+            console.debug(
+              'Active element is not in the iframe, skipping translation',
+            )
             return
           }
           console.log('No active element', location.href)

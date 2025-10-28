@@ -14,6 +14,8 @@ stats-*.json
 .wxt
 web-ext.config.ts
 .env.local
+.claude
+
 
 # Editor directories and files
 .vscode/*

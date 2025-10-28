@@ -2,16 +2,16 @@ interface Selection {
   hasSelection: () => boolean
 
   getSelection: () => string
-  replaceSelection: (text: string) => boolean | Promise<boolean>
+  replaceSelection: (text: string) => Promise<boolean>
 
   getInputValue: () => string
-  replaceInputValue: (text: string) => boolean | Promise<boolean>
+  replaceInputValue: (text: string) => Promise<boolean>
 }
 
 export function inputOrTextareaSelection(
   element: HTMLInputElement | HTMLTextAreaElement,
 ): Selection {
-  const replaceSelection = (text: string): boolean => {
+  const replaceSelection = async (text: string): Promise<boolean> => {
     const doc = element.ownerDocument || document
     const u = element.selectionStart
     const v = element.selectionEnd
@@ -21,35 +21,23 @@ export function inputOrTextareaSelection(
 
     element.focus()
 
-    // beforeinput: delete
-    const delEvt = new InputEvent('beforeinput', {
-      inputType: 'deleteContentBackward',
-      data: null,
+    // beforeinput: insert
+    const insEvt = new InputEvent('beforeinput', {
+      inputType: 'insertText',
+      data: text,
       bubbles: true,
       cancelable: true,
     })
-    const delPrevented = !element.dispatchEvent(delEvt)
-    if (!delPrevented) {
+    const insPrevented = !element.dispatchEvent(insEvt)
+    if (!insPrevented) {
       // @deprecated
-      doc.execCommand('delete', false)
-      // beforeinput: insert
-      const insEvt = new InputEvent('beforeinput', {
-        inputType: 'insertText',
-        data: text,
+      doc.execCommand('insertText', false, text)
+      // input 事件
+      const inputEvt = new Event('input', {
         bubbles: true,
         cancelable: true,
       })
-      const insPrevented = !element.dispatchEvent(insEvt)
-      if (!insPrevented) {
-        // @deprecated
-        doc.execCommand('insertText', false, text)
-        // input 事件
-        const inputEvt = new Event('input', {
-          bubbles: true,
-          cancelable: true,
-        })
-        element.dispatchEvent(inputEvt)
-      }
+      element.dispatchEvent(inputEvt)
     }
     return true
   }

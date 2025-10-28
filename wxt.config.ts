@@ -38,7 +38,7 @@ export default defineConfig({
           description: 'Translate your input text with AI.',
         },
       },
-      homepage_url: 'https://rxliuli.com/projects/input-translator',
+      homepage_url: 'https://rxliuli.com/project/input-translator',
     }
     if (env.browser === 'firefox') {
       manifest.browser_specific_settings = {

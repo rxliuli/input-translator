@@ -2,12 +2,14 @@ import { OptionalKeysOf } from 'type-fest'
 
 export interface Settings {
   to?: string
-  engine?: 'google' | 'openai'
+  engine?: 'google' | 'openai' | 'chrome-ai'
 
   apiKey?: string
   model?: string
   baseUrl?: string
   prompt?: string
+
+  chromeAiSourceLanguage?: string
 }
 
 const Prompt = `
@@ -26,6 +28,7 @@ export function getDefaultSettings(): Pick<Settings, OptionalKeysOf<Settings>> {
     baseUrl: 'https://api.openai.com/v1',
     prompt: Prompt,
     model: 'gpt-4.1-mini',
+    chromeAiSourceLanguage: 'en',
   }
 }
 
@@ -38,6 +41,7 @@ export async function getSettings(): Promise<Settings> {
       'prompt',
       'model',
       'apiKey',
+      'chromeAiSourceLanguage',
     ])),
   }
 }

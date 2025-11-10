@@ -2,7 +2,7 @@ import {
   ITranslatorHandler,
   Translator as GoogleTranslator,
 } from '@liuli-util/google-translate-api-free'
-import { Translator } from './base'
+import { Translator } from './types'
 
 class TranslatorHandler implements ITranslatorHandler {
   async handle<T>(url: string): Promise<T> {

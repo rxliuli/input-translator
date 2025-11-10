@@ -1,5 +1,5 @@
 import { getMergedSettings, Settings } from '../settings'
-import { Translator } from './base'
+import { Translator } from './types'
 
 const newModels = [
   'gpt-5-nano',

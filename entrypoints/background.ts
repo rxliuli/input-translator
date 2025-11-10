@@ -2,6 +2,7 @@ import { messaging } from '@/lib/messaging'
 import { google } from '../lib/translate/google'
 import { getMergedSettings } from '@/lib/settings'
 import { openai } from '@/lib/translate/openai'
+import { chrome } from '@/lib/translate/chrome-ai'
 
 async function translate(tabId: number) {
   await messaging.sendMessage('triggerTranslate', undefined, tabId)
@@ -18,7 +19,12 @@ export default defineBackground(() => {
 
   messaging.onMessage('translateText', async (ev) => {
     const settings = await getMergedSettings()
-    const client = settings.engine === 'google' ? google : openai
+    const client =
+      settings.engine === 'google'
+        ? google
+        : settings.engine === 'chrome-ai'
+        ? chrome
+        : openai
     try {
       return await client.translate(ev.data, { to: settings.to! })
     } catch (error) {

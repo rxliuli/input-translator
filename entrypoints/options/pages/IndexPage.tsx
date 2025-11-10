@@ -19,6 +19,13 @@ import {
 import { FaDiscord } from 'react-icons/fa'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  isChromeAIAvailable,
+  checkLanguageModel,
+  downloadLanguageModel,
+} from '@/lib/translate/chrome-ai'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const defaultSettings = getDefaultSettings()
 
@@ -40,6 +47,7 @@ export function IndexPage() {
       ...value,
     } as Settings
     setSettings(newSettings)
+    console.log('Saving settings:', newSettings)
     await setSyncSettings(newSettings)
   }
 
@@ -93,49 +101,179 @@ export function IndexPage() {
                 <SelectContent>
                   <SelectItem value="google">Google</SelectItem>
                   <SelectItem value="openai">OpenAI</SelectItem>
+                  {import.meta.env.CHROME && isChromeAIAvailable() && (
+                    <SelectItem value="chrome-ai">Chrome AI</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
 
             {settings.engine === 'openai' && (
-              <div className="grid gap-6">
-                <div className="grid gap-2">
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    value={settings.apiKey}
-                    onChange={(e) => handleChange({ apiKey: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>OpenAI Model</Label>
-                  <Input
-                    type="text"
-                    value={settings.model ?? defaultSettings.model}
-                    onChange={(e) => handleChange({ model: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>OpenAI Base URL</Label>
-                  <Input
-                    type="text"
-                    value={settings.baseUrl ?? defaultSettings.baseUrl}
-                    onChange={(e) => handleChange({ baseUrl: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>OpenAI Prompt</Label>
-                  <Textarea
-                    rows={4}
-                    value={settings.prompt ?? defaultSettings.prompt}
-                    onChange={(e) => handleChange({ prompt: e.target.value })}
-                  />
-                </div>
-              </div>
+              <OpenAISettings settings={settings} onChange={handleChange} />
+            )}
+            {settings.engine === 'chrome-ai' && (
+              <ChromeAISettings settings={settings} onChange={handleChange} />
             )}
           </form>
         </CardContent>
       </Card>
+    </div>
+  )
+}
+
+function ChromeAISettings(props: {
+  settings: Settings
+  onChange: (value: Partial<Settings>) => void
+}) {
+  const { settings, onChange } = props
+  const [modelStatus, setModelStatus] = useState<
+    'checking' | 'available' | 'downloadable' | 'unavailable'
+  >('checking')
+  const [downloading, setDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState(0)
+
+  const sourceLanguage =
+    settings.chromeAiSourceLanguage ?? defaultSettings.chromeAiSourceLanguage!
+  const targetLanguage = settings.to ?? defaultSettings.to!
+
+  useEffect(() => {
+    const checkModel = async () => {
+      setModelStatus('checking')
+      const status = await checkLanguageModel(sourceLanguage, targetLanguage)
+      setModelStatus(status)
+    }
+    checkModel()
+  }, [sourceLanguage, targetLanguage])
+
+  const handleDownload = async () => {
+    try {
+      setDownloading(true)
+      setDownloadProgress(0)
+      await downloadLanguageModel(sourceLanguage, targetLanguage, (progress) => {
+        setDownloadProgress(progress)
+      })
+      setModelStatus('available')
+    } catch (error) {
+      console.error('Failed to download language model:', error)
+    } finally {
+      setDownloading(false)
+      setDownloadProgress(0)
+    }
+  }
+
+  return (
+    <div className="grid gap-6">
+      <div className="grid gap-2">
+        <Label>Source Language (Input Language)</Label>
+        <Select
+          value={sourceLanguage}
+          onValueChange={(value) =>
+            onChange({ chromeAiSourceLanguage: value })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select source language" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(langs)
+              .filter(([key]) => key !== 'auto')
+              .map(([key, value]) => (
+                <SelectItem key={key} value={key}>
+                  {value}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid gap-2">
+        <Label>Language Model Status</Label>
+        {modelStatus === 'checking' && (
+          <Alert>
+            <AlertDescription>Checking language model...</AlertDescription>
+          </Alert>
+        )}
+        {modelStatus === 'available' && (
+          <Alert>
+            <AlertDescription>
+              Language model for {sourceLanguage} → {targetLanguage} is
+              available
+            </AlertDescription>
+          </Alert>
+        )}
+        {modelStatus === 'downloadable' && (
+          <div className="grid gap-2">
+            <Alert>
+              <AlertDescription>
+                Language model for {sourceLanguage} → {targetLanguage} needs to
+                be downloaded before use
+              </AlertDescription>
+            </Alert>
+            {!downloading && (
+              <Button onClick={handleDownload}>Download Language Model</Button>
+            )}
+            {downloading && (
+              <div className="grid gap-2">
+                <Progress value={downloadProgress} />
+                <p className="text-sm text-muted-foreground">
+                  Downloading... {Math.round(downloadProgress)}%
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+        {modelStatus === 'unavailable' && (
+          <Alert variant="destructive">
+            <AlertDescription>
+              Language model for {sourceLanguage} → {targetLanguage} is not
+              supported
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function OpenAISettings(props: {
+  settings: Settings
+  onChange: (value: Partial<Settings>) => void
+}) {
+  const { settings, onChange } = props
+  return (
+    <div className="grid gap-6">
+      <div className="grid gap-2">
+        <Label>OpenAI API Key</Label>
+        <Input
+          type="password"
+          value={settings.apiKey}
+          onChange={(e) => onChange({ apiKey: e.target.value })}
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label>OpenAI Model</Label>
+        <Input
+          type="text"
+          value={settings.model ?? defaultSettings.model}
+          onChange={(e) => onChange({ model: e.target.value })}
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label>OpenAI Base URL</Label>
+        <Input
+          type="text"
+          value={settings.baseUrl ?? defaultSettings.baseUrl}
+          onChange={(e) => onChange({ baseUrl: e.target.value })}
+        />
+      </div>
+      <div className="grid gap-2">
+        <Label>OpenAI Prompt</Label>
+        <Textarea
+          rows={4}
+          value={settings.prompt ?? defaultSettings.prompt}
+          onChange={(e) => onChange({ prompt: e.target.value })}
+        />
+      </div>
     </div>
   )
 }

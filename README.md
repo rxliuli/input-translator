@@ -1,7 +1,5 @@
 # Input Translator
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/rxliuli)
-
 A lightweight browser extension for instant text translation in any input field.
 
 ## Features

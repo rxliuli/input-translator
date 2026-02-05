@@ -157,6 +157,45 @@ describe('editable selection', () => {
   })
   // https://quilljs.com/
   it.todo('quill editor')
+
+  // Discord uses Slate editor which inserts U+FEFF and extra newlines for empty lines
+  it('Discord/Slate editor multiline with empty lines', () => {
+    // Simulate Discord's Slate editor HTML structure for:
+    // "first line"
+    // (empty line)
+    // "second line"
+    input.innerHTML = `
+      <div data-slate-node="element">
+        <span data-slate-node="text">
+          <span data-slate-leaf="true">
+            <span data-slate-string="true">first line</span>
+          </span>
+        </span>
+      </div>
+      <div data-slate-node="element">
+        <span data-slate-node="text">
+          <span data-slate-leaf="true" class="emptyText__1464f">
+            <span data-slate-zero-width="n" data-slate-length="0">\uFEFF<br></span>
+          </span>
+        </span>
+      </div>
+      <div data-slate-node="element">
+        <span data-slate-node="text">
+          <span data-slate-leaf="true">
+            <span data-slate-string="true">second line</span>
+          </span>
+        </span>
+      </div>
+    `
+
+    const selection = editableSelection(input)
+    const value = selection.getInputValue()
+
+    // Should normalize to exactly one empty line (two newlines)
+    // Without the fix, innerText returns "first line\n﻿\n\nsecond line" (with U+FEFF and 3 newlines)
+    expect(value).eq('first line\n\nsecond line')
+    expect(value).not.include('\uFEFF')
+  })
 })
 
 describe('tryExecCommandInsertText', () => {

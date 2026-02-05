@@ -50,6 +50,7 @@ export default defineContentScript({
           alert('No text to translate')
           return
         }
+        console.debug('Translating text:', JSON.stringify(textToTranslate))
         const translatedText = await messaging.sendMessage(
           'translateText',
           textToTranslate,

@@ -145,7 +145,11 @@ export async function tryExecCommandInsertText(
 
 export function editableSelection(element: HTMLElement): Selection {
   const getInputValue = () => {
-    return element.innerText || element.textContent || ''
+    const raw = element.innerText || element.textContent || ''
+    // Normalize line breaks: Slate editor (used by Discord) inserts U+FEFF (zero-width no-break space)
+    // and extra newlines for empty lines, causing "\n﻿\n\n" instead of "\n\n".
+    // Remove U+FEFF and collapse 3+ consecutive newlines to 2.
+    return raw.replace(/\uFEFF/g, '').replace(/\n{3,}/g, '\n\n')
   }
   const getSelection = () => {
     const selection = window.getSelection()

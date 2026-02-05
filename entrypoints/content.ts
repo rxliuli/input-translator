@@ -7,12 +7,13 @@ import {
   isInputElement,
   writeClipboard,
 } from '@/lib/selection'
+import { getMergedSettings } from '@/lib/settings'
 import { UniversalSpaceDetector } from '@/lib/UniversalSpaceDetector'
 
 export default defineContentScript({
   matches: ['<all_urls>'],
   allFrames: true,
-  main: () => {
+  main: async () => {
     messaging.onMessage('getSelect', getSelect)
     messaging.onMessage('writeClipboard', (ev) => writeClipboard(ev.data))
     messaging.onMessage('triggerTranslate', triggerTranslate)
@@ -73,6 +74,21 @@ export default defineContentScript({
       }
     }
 
-    new UniversalSpaceDetector(triggerTranslate)
+    const spaceDetector = new UniversalSpaceDetector(triggerTranslate)
+
+    const settings = await getMergedSettings()
+    if (settings.enableTripleSpace !== false) {
+      spaceDetector.enable()
+    }
+
+    browser.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName === 'sync' && 'enableTripleSpace' in changes) {
+        if (changes.enableTripleSpace.newValue !== false) {
+          spaceDetector.enable()
+        } else {
+          spaceDetector.disable()
+        }
+      }
+    })
   },
 })

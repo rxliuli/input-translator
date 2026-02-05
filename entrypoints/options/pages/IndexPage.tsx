@@ -26,6 +26,7 @@ import {
 } from '@/lib/translate/chrome-ai'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Switch } from '@/components/ui/switch'
 
 const defaultSettings = getDefaultSettings()
 
@@ -114,6 +115,15 @@ export function IndexPage() {
             {settings.engine === 'chrome-ai' && (
               <ChromeAISettings settings={settings} onChange={handleChange} />
             )}
+
+            <div className="grid gap-2">
+              <Label htmlFor="triple-space">Triple-Space to Translate</Label>
+              <Switch
+                id="triple-space"
+                checked={settings?.enableTripleSpace ?? defaultSettings.enableTripleSpace}
+                onCheckedChange={(checked) => handleChange({ enableTripleSpace: checked })}
+              />
+            </div>
           </form>
         </CardContent>
       </Card>

@@ -5,14 +5,18 @@ export class UniversalSpaceDetector {
   private spaceCount: number
   private lastSpaceTime: number
   private TIMEOUT: number
+  private handler: ((e: KeyboardEvent | InputEvent) => void) | null = null
+  private _enabled: boolean = false
 
   constructor(private readonly callback: () => void) {
     this.isMobile = this.detectMobile()
     this.spaceCount = 0
     this.lastSpaceTime = 0
     this.TIMEOUT = this.isMobile ? 800 : 500
+  }
 
-    this.init()
+  get enabled() {
+    return this._enabled
   }
 
   private detectMobile() {
@@ -25,32 +29,34 @@ export class UniversalSpaceDetector {
     )
   }
 
-  private init() {
+  enable() {
+    if (this._enabled) return
+    this._enabled = true
+
     if (this.isMobile) {
-      this.initMobileListeners()
+      this.handler = (e) => {
+        this.handleSpace(e as InputEvent, (e as InputEvent).data)
+      }
+      document.addEventListener('beforeinput', this.handler, true)
     } else {
-      this.initDesktopListeners()
+      this.handler = (e) => {
+        this.handleSpace(e as KeyboardEvent, (e as KeyboardEvent).key)
+      }
+      document.addEventListener('keydown', this.handler, true)
     }
   }
 
-  private initDesktopListeners() {
-    document.addEventListener(
-      'keydown',
-      (e) => {
-        this.handleSpace(e, e.key)
-      },
-      true,
-    )
-  }
+  disable() {
+    if (!this._enabled || !this.handler) return
+    this._enabled = false
 
-  private initMobileListeners() {
-    document.addEventListener(
-      'beforeinput',
-      (e) => {
-        this.handleSpace(e, e.data)
-      },
-      true,
-    )
+    if (this.isMobile) {
+      document.removeEventListener('beforeinput', this.handler, true)
+    } else {
+      document.removeEventListener('keydown', this.handler, true)
+    }
+    this.handler = null
+    this.spaceCount = 0
   }
 
   private handleSpace(e: KeyboardEvent | InputEvent, key: string | null) {

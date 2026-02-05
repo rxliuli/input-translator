@@ -3,6 +3,7 @@ import { OptionalKeysOf } from 'type-fest'
 export interface Settings {
   to?: string
   engine?: 'google' | 'openai' | 'chrome-ai'
+  enableTripleSpace?: boolean
 
   apiKey?: string
   model?: string
@@ -25,6 +26,7 @@ export function getDefaultSettings(): Pick<Settings, OptionalKeysOf<Settings>> {
   return {
     to: 'en',
     engine: 'google',
+    enableTripleSpace: true,
     baseUrl: 'https://api.openai.com/v1',
     prompt: Prompt,
     model: 'gpt-4.1-mini',
@@ -37,6 +39,7 @@ export async function getSettings(): Promise<Settings> {
     ...(await browser.storage.sync.get<Settings>([
       'to',
       'engine',
+      'enableTripleSpace',
       'baseUrl',
       'prompt',
       'model',

@@ -75,13 +75,21 @@ function isInputOrTextarea(
 }
 
 function selectAll(el: Element) {
-  const doc = el.ownerDocument || document
-  const sel = doc.getSelection?.()
+  const sel = el.ownerDocument.getSelection?.()
   if (!sel) return
-  const range = doc.createRange()
-  range.selectNodeContents(el)
-  sel.removeAllRanges()
-  sel.addRange(range)
+    // Use setBaseAndExtent instead of removeAllRanges() + addRange().
+  // In iOS Safari (WebKit), removeAllRanges() causes the editable element
+  // to lose focus, because WebKit ties focus to selection — clearing the
+  // selection clears focus. And without removeAllRanges(), addRange() is
+  // silently ignored when a selection already exists.
+  // setBaseAndExtent atomically replaces the selection without this issue.
+  //
+  // Related:
+  // - https://bugs.webkit.org/show_bug.cgi?id=38696
+  //   (WebKit moves focus to where selection is)
+  // - https://bugzilla.mozilla.org/show_bug.cgi?id=1318312
+  //   (cross-browser Selection API / focus interaction differences)
+  sel.setBaseAndExtent(el, 0, el, el.childNodes.length)
 }
 
 function dispatchInput(el: Element) {

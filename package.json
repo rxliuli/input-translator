@@ -2,7 +2,7 @@
   "name": "input-translator",
   "description": "manifest.json description",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.5.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

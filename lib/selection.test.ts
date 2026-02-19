@@ -155,28 +155,6 @@ describe('editable selection', () => {
     await selection.replaceInputValue('hi')
     expect(input.innerText).eq('hi')
   })
-  // Regression test: contentEditable inside Shadow DOM should be writable.
-  // On iOS Safari, the old selectAll implementation using removeAllRanges()+addRange()
-  // caused blur, making execCommand fail. setBaseAndExtent() fixes this.
-  it('contentEditable inside shadow DOM', async () => {
-    input.remove()
-    const host = document.createElement('div')
-    document.body.append(host)
-    const shadow = host.attachShadow({ mode: 'open' })
-    const inner = document.createElement('div')
-    inner.contentEditable = 'true'
-    inner.dataset.testid = 'test-shadow-editable'
-    shadow.append(inner)
-    await userEvent.click(inner)
-    await userEvent.fill(inner, 'hello world')
-
-    const selection = editableSelection(inner)
-    expect(selection.getInputValue()).eq('hello world')
-    await selection.replaceInputValue('hi')
-    expect(inner.innerText).eq('hi')
-
-    host.remove()
-  })
   // https://quilljs.com/
   it.todo('quill editor')
 

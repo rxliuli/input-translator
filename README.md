@@ -68,7 +68,7 @@ Download from [Chrome Web Store](https://chromewebstore.google.com/detail/namibp
 
 - **Report Issues**: [GitHub Issues](https://github.com/rxliuli/input-translator/issues)
 - **Contact Email**: [rxliuli@gmail.com](mailto:rxliuli@gmail.com)
-- **Discord Community**: [Join our Discord](https://discord.gg/fErBc3wYrC)
+- **Discord Community**: [Join our Discord](https://discord.gg/gFhKUthc88)
 - **Documentation**: You're reading it! This README contains all usage instructions.
 
 ### Frequently Asked Questions

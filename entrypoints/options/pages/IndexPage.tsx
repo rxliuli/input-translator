@@ -57,7 +57,7 @@ export function IndexPage() {
       <header className="mb-6 px-6 md:px-0 flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Input Translator</h1>
         <a
-          href="https://discord.gg/fErBc3wYrC"
+          href="https://discord.gg/gFhKUthc88"
           target="_blank"
           rel="noreferrer"
         >

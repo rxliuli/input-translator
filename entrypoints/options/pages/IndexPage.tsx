@@ -17,6 +17,7 @@ import {
   Settings,
 } from '@/lib/settings'
 import { FaDiscord } from 'react-icons/fa'
+import { ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -55,7 +56,18 @@ export function IndexPage() {
   return (
     <div className="container mx-auto max-w-3xl py-6 md:py-10">
       <header className="mb-6 px-6 md:px-0 flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Input Translator</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Input Translator</h1>
+          <a
+            href="https://store.rxliuli.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Explore our other extensions
+          </a>
+        </div>
         <a
           href="https://discord.gg/gFhKUthc88"
           target="_blank"

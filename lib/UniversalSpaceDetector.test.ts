@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UniversalSpaceDetector } from './UniversalSpaceDetector'
-import { commands, userEvent } from '@vitest/browser/context'
+import { commands, userEvent } from 'vitest/browser'
 
 let input: HTMLInputElement
 beforeEach(async () => {

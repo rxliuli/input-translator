@@ -4,7 +4,7 @@ import {
   inputOrTextareaSelection,
   tryExecCommandInsertText,
 } from './selection'
-import { commands, userEvent } from '@vitest/browser/context'
+import { commands, userEvent } from 'vitest/browser'
 
 describe('input or textarea selection', () => {
   let input: HTMLInputElement

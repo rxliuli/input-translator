@@ -2,13 +2,16 @@ import { defineConfig, UserManifest } from 'wxt'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  modules: ['@wxt-dev/module-react'],
+  modules: ['@wxt-dev/module-react', 'wxt-module-safari-xcode'],
+  safariXcode: {
+    appCategory: 'public.app-category.productivity',
+    bundleIdentifier: 'com.rxliuli.Input-Translator',
+    developmentTeam: 'N2X78TUUFG',
+  },
   vite: () => ({
-    plugins: [tailwindcss()] as any,
+    plugins: [tailwindcss()],
     resolve: {
-      alias: {
-        '@': __dirname,
-      },
+      tsconfigPaths: true,
     },
   }),
   manifestVersion: 3,

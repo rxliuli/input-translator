@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
+import { playwright } from '@vitest/browser-playwright'
 import { readFile } from 'fs/promises'
-import { BrowserCommands } from '@vitest/browser/context'
+import { BrowserCommands } from 'vitest/internal/browser'
 import { BrowserCommandContext } from 'vitest/node'
 
 type CustomCommand<K extends keyof BrowserCommands> = (
@@ -43,10 +43,7 @@ const keypress: CustomCommand<'keypress'> = async (ctx, key) => {
   await ctx.page.keyboard.press(key)
 }
 
-declare module '@vitest/browser/context' {
-  interface Locator {
-    element(): HTMLElement
-  }
+declare module 'vitest/internal/browser' {
   interface BrowserCommands {
     waitForDownload: () => Promise<{
       suggestedFilename: string
@@ -69,12 +66,13 @@ export default defineConfig({
   test: {
     projects: [
       {
-        plugins: [react(), tsconfigPaths()] as any,
+        plugins: [react()] as any,
+        resolve: { tsconfigPaths: true },
         test: {
           exclude: ['**/*.unit.test.ts', 'node_modules/**'],
           browser: {
             enabled: true,
-            provider: 'playwright',
+            provider: playwright(),
             // https://vitest.dev/guide/browser/playwright
             instances: [{ browser: 'chromium', headless: true }],
             commands: {
@@ -89,7 +87,7 @@ export default defineConfig({
         },
       },
       {
-        plugins: [tsconfigPaths()] as any,
+        resolve: { tsconfigPaths: true },
         test: {
           include: ['**/*.unit.test.ts'],
           exclude: ['*.test.ts', 'node_modules/**'],

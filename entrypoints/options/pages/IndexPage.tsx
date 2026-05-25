@@ -1,11 +1,8 @@
 import { Label } from '@/components/ui/label'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  NativeSelect,
+  NativeSelectOption,
+} from '@/components/ui/native-select'
 import { langs } from './constants/lang'
 import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
@@ -19,7 +16,6 @@ import {
 import { FaDiscord } from 'react-icons/fa'
 import { ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   isChromeAIAvailable,
   checkLanguageModel,
@@ -54,8 +50,8 @@ export function IndexPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-4 md:py-6">
-      <header className="mb-4 px-6 md:px-0 flex items-center justify-between">
+    <div className="mx-auto max-w-md p-4">
+      <header className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Input Translator</h1>
           <a
@@ -78,67 +74,55 @@ export function IndexPage() {
           </Button>
         </a>
       </header>
-      <Card>
-        <CardContent>
-          <form className="grid gap-6">
-            <div className="grid gap-2">
-              <Label>Translate Language</Label>
-              <Select
-                value={settings?.to ?? defaultSettings.to}
-                onValueChange={(value) => handleChange({ to: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(langs).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {value}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      <form className="grid gap-6">
+        <div className="grid gap-2">
+          <Label>Translate Language</Label>
+          <NativeSelect
+            value={settings?.to ?? defaultSettings.to}
+            onChange={(e) => handleChange({ to: e.target.value })}
+          >
+            {Object.entries(langs).map(([key, value]) => (
+              <NativeSelectOption key={key} value={key}>
+                {value}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        </div>
 
-            <div className="grid gap-2">
-              <Label>Engine</Label>
-              <Select
-                value={settings?.engine ?? defaultSettings.engine}
-                onValueChange={(value) =>
-                  handleChange({ engine: value as Settings['engine'] })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an engine" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="google">Google</SelectItem>
-                  <SelectItem value="openai">OpenAI</SelectItem>
-                  {import.meta.env.CHROME && isChromeAIAvailable() && (
-                    <SelectItem value="chrome-ai">Chrome AI</SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {settings.engine === 'openai' && (
-              <OpenAISettings settings={settings} onChange={handleChange} />
+        <div className="grid gap-2">
+          <Label>Engine</Label>
+          <NativeSelect
+            value={settings?.engine ?? defaultSettings.engine}
+            onChange={(e) =>
+              handleChange({ engine: e.target.value as Settings['engine'] })
+            }
+          >
+            <NativeSelectOption value="google">Google</NativeSelectOption>
+            <NativeSelectOption value="openai">OpenAI</NativeSelectOption>
+            {import.meta.env.CHROME && isChromeAIAvailable() && (
+              <NativeSelectOption value="chrome-ai">
+                Chrome AI
+              </NativeSelectOption>
             )}
-            {settings.engine === 'chrome-ai' && (
-              <ChromeAISettings settings={settings} onChange={handleChange} />
-            )}
+          </NativeSelect>
+        </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="triple-space">Triple-Space to Translate</Label>
-              <Switch
-                id="triple-space"
-                checked={settings?.enableTripleSpace ?? defaultSettings.enableTripleSpace}
-                onCheckedChange={(checked) => handleChange({ enableTripleSpace: checked })}
-              />
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+        {settings.engine === 'openai' && (
+          <OpenAISettings settings={settings} onChange={handleChange} />
+        )}
+        {settings.engine === 'chrome-ai' && (
+          <ChromeAISettings settings={settings} onChange={handleChange} />
+        )}
+
+        <div className="grid gap-2">
+          <Label htmlFor="triple-space">Triple-Space to Translate</Label>
+          <Switch
+            id="triple-space"
+            checked={settings?.enableTripleSpace ?? defaultSettings.enableTripleSpace}
+            onCheckedChange={(checked) => handleChange({ enableTripleSpace: checked })}
+          />
+        </div>
+      </form>
     </div>
   )
 }
@@ -187,25 +171,18 @@ function ChromeAISettings(props: {
     <div className="grid gap-6">
       <div className="grid gap-2">
         <Label>Source Language (Input Language)</Label>
-        <Select
+        <NativeSelect
           value={sourceLanguage}
-          onValueChange={(value) =>
-            onChange({ chromeAiSourceLanguage: value })
-          }
+          onChange={(e) => onChange({ chromeAiSourceLanguage: e.target.value })}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Select source language" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(langs)
-              .filter(([key]) => key !== 'auto')
-              .map(([key, value]) => (
-                <SelectItem key={key} value={key}>
-                  {value}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
+          {Object.entries(langs)
+            .filter(([key]) => key !== 'auto')
+            .map(([key, value]) => (
+              <NativeSelectOption key={key} value={key}>
+                {value}
+              </NativeSelectOption>
+            ))}
+        </NativeSelect>
       </div>
 
       <div className="grid gap-2">

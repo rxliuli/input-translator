@@ -54,10 +54,10 @@ export function IndexPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-6 md:py-10">
-      <header className="mb-6 px-6 md:px-0 flex items-center justify-between">
+    <div className="container mx-auto max-w-3xl py-4 md:py-6">
+      <header className="mb-4 px-6 md:px-0 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Input Translator</h1>
+          <h1 className="text-xl font-bold tracking-tight">Input Translator</h1>
           <a
             href="https://store.rxliuli.com/"
             target="_blank"

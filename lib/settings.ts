@@ -11,6 +11,8 @@ export interface Settings {
   prompt?: string
 
   chromeAiSourceLanguage?: string
+
+  recentLanguages?: string[]
 }
 
 const Prompt = `
@@ -45,6 +47,7 @@ export async function getSettings(): Promise<Settings> {
       'model',
       'apiKey',
       'chromeAiSourceLanguage',
+      'recentLanguages',
     ])),
   }
 }

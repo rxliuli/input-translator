@@ -5,7 +5,7 @@ A lightweight browser extension for instant text translation in any input field.
 ## Features
 
 - **Instant Translation** - Translate directly in input fields without switching tabs
-- **Free by Default** - Uses Google Translate, no configuration required
+- **Free by Default** - Uses Microsoft Translator (Google Translate also available), no configuration required
 - **AI Support** - Configure OpenAI API or compatible LLM providers (OpenRouter, etc.)
 - **Universal Compatibility** - Works with text inputs and rich text editors
 
@@ -77,7 +77,7 @@ Download from [Chrome Web Store](https://chromewebstore.google.com/detail/namibp
 A: Some websites may override keyboard shortcuts. Try using the hotkey (Alt+T) or context menu instead.
 
 **Q: Is it free to use?**
-A: Yes! The extension uses Google Translate by default which is free. OpenAI API is optional.
+A: Yes! The extension uses Microsoft Translator by default which is free, with Google Translate as a free alternative. OpenAI API is optional.
 
 **Q: How do I change the translation hotkey?**
 A: Go to your browser's extension shortcuts settings and customize the keyboard shortcut.
@@ -86,7 +86,7 @@ A: Go to your browser's extension shortcuts settings and customize the keyboard 
 A: Verify your API key is correct and has sufficient credits. For OpenRouter, ensure you've set the correct API Base URL.
 
 **Q: Which languages are supported?**
-A: The extension supports all languages available in Google Translate and your configured AI model.
+A: The extension supports all languages available in Microsoft Translator, Google Translate, and your configured AI model.
 
 **Q: How do I change the translation target language?**
 A: Go to the extension settings and select your preferred target language.

@@ -2,15 +2,13 @@ import { OptionalKeysOf } from 'type-fest'
 
 export interface Settings {
   to?: string
-  engine?: 'google' | 'openai' | 'chrome-ai'
+  engine?: 'microsoft' | 'google' | 'openai'
   enableTripleSpace?: boolean
 
   apiKey?: string
   model?: string
   baseUrl?: string
   prompt?: string
-
-  chromeAiSourceLanguage?: string
 
   recentLanguages?: string[]
 }
@@ -27,12 +25,11 @@ Translate to {to} (output translation only):
 export function getDefaultSettings(): Pick<Settings, OptionalKeysOf<Settings>> {
   return {
     to: 'en',
-    engine: 'google',
+    engine: 'microsoft',
     enableTripleSpace: true,
     baseUrl: 'https://api.openai.com/v1',
     prompt: Prompt,
     model: 'gpt-4.1-mini',
-    chromeAiSourceLanguage: 'en',
   }
 }
 
@@ -46,7 +43,6 @@ export async function getSettings(): Promise<Settings> {
       'prompt',
       'model',
       'apiKey',
-      'chromeAiSourceLanguage',
       'recentLanguages',
     ])),
   }

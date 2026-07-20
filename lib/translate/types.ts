@@ -9,3 +9,10 @@ export interface Translator {
     },
   ) => Promise<string>
 }
+
+// Batch-shaped result matching imp-translate's translator core, kept identical
+// so the endpoint implementations can later be extracted into a shared package.
+export interface TranslationResult {
+  texts: string[]
+  detectedLang?: string
+}

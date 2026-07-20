@@ -11,9 +11,6 @@ importers:
 
   .:
     dependencies:
-      '@liuli-util/google-translate-api-free':
-        specifier: ^0.2.0
-        version: 0.2.0
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@8.0.14(@types/node@25.9.1)(esbuild@0.27.7)(jiti@2.7.0))
@@ -384,9 +381,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@liuli-util/google-translate-api-free@0.2.0':
-    resolution: {integrity: sha512-lgx/L4h9NKAft4Mk7OHjuc1JxWa8qaAX4iS9eztXqsJ6dwlY+mS32TFKoMQlXTBe/6szFIHy6sbGD+slx2GHTg==}
 
   '@napi-rs/wasm-runtime@1.1.4':
     resolution: {integrity: sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow==}
@@ -3329,8 +3323,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@liuli-util/google-translate-api-free@0.2.0': {}
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:

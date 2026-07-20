@@ -2,7 +2,7 @@ import { messaging } from '@/lib/messaging'
 import { google } from '../lib/translate/google'
 import { getMergedSettings, setSyncSettings } from '@/lib/settings'
 import { openai } from '@/lib/translate/openai'
-import { chrome } from '@/lib/translate/chrome-ai'
+import { microsoft } from '@/lib/translate/microsoft'
 import { langs, defaultPopularLanguages } from '@/lib/langs'
 
 const MENU_PREFIX = 'translate-lang-'
@@ -93,8 +93,22 @@ async function updateRecentLanguages(langCode: string) {
   await setSyncSettings({ recentLanguages: updated })
 }
 
+// The chrome-ai engine was removed in 0.6.0; users who had selected it fall
+// back to the default engine.
+async function migrateSettings() {
+  const stored = await browser.storage.sync.get<{ engine?: string }>([
+    'engine',
+  ])
+  const removals = ['chromeAiSourceLanguage']
+  if (stored.engine === 'chrome-ai') {
+    removals.push('engine')
+  }
+  await browser.storage.sync.remove(removals)
+}
+
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(() => {
+    migrateSettings()
     buildContextMenu()
   })
 
@@ -114,11 +128,11 @@ export default defineBackground(() => {
   messaging.onMessage('translateText', async (ev) => {
     const settings = await getMergedSettings()
     const client =
-      settings.engine === 'google'
-        ? google
-        : settings.engine === 'chrome-ai'
-          ? chrome
-          : openai
+      settings.engine === 'openai'
+        ? openai
+        : settings.engine === 'google'
+          ? google
+          : microsoft
     try {
       const result = await client.translate(ev.data, { to: settings.to! })
       if (result) {

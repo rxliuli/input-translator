@@ -2,8 +2,8 @@ import { defineConfig, UserManifest } from 'wxt'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  modules: ['@wxt-dev/module-react', 'wxt-module-safari-xcode'],
-  safariXcode: {
+  modules: ['@wxt-dev/module-react', '@extport/wxt'],
+  extport: {
     appCategory: 'public.app-category.productivity',
     bundleIdentifier: 'com.rxliuli.Input-Translator',
     developmentTeam: 'N2X78TUUFG',

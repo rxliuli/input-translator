@@ -66,6 +66,9 @@ importers:
         specifier: ^5.6.0
         version: 5.6.0
     devDependencies:
+      '@extport/wxt':
+        specifier: ^0.0.3
+        version: 0.0.3(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)
       '@types/node':
         specifier: ^25.9.1
         version: 25.9.1
@@ -120,9 +123,6 @@ importers:
       wxt:
         specifier: ^0.20.26
         version: 0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)
-      wxt-module-safari-xcode:
-        specifier: ^0.2.2
-        version: 0.2.2(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)
       zx:
         specifier: ^8.8.5
         version: 8.8.5
@@ -350,6 +350,10 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@extport/wxt@0.0.3':
+    resolution: {integrity: sha512-d9bIhwrb+YQnDEI9X47QFKeQhvH2Pl+qZ8Xy/NrSV3BO49WJfIPTbiK3OpuqVO+7BaJvjWkF1euzJ01+QckBkQ==}
+    engines: {node: '>=18'}
 
   '@floating-ui/core@1.7.5':
     resolution: {integrity: sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==}
@@ -3085,9 +3089,6 @@ packages:
     resolution: {integrity: sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==}
     engines: {node: '>=20'}
 
-  wxt-module-safari-xcode@0.2.2:
-    resolution: {integrity: sha512-NRywJk/RSv5IO8zql1+mh3Hu6bsRq4ZCfXxE1L5FB376axG+4xW63dVJ+LuGFMVOf4hOJcRc9vQs5ZnWGSDwzA==}
-
   wxt@0.20.26:
     resolution: {integrity: sha512-PMGz7sAlONJgwBkOriInXOoEU6/jlGKrhSFvZfiBPHZocyYPfnw1lod9rGDra957H83WO+TnGjYwJiGYciSIqA==}
     engines: {bun: '>=1.2.0', node: '>=20.12.0'}
@@ -3287,6 +3288,28 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.7':
     optional: true
+
+  '@extport/wxt@0.0.3(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)':
+    optionalDependencies:
+      wxt: 0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)
+    transitivePeerDependencies:
+      - '@types/node'
+      - '@vitejs/devtools'
+      - canvas
+      - eslint
+      - jiti
+      - less
+      - oxc-parser
+      - rolldown
+      - rollup
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - supports-color
+      - terser
+      - tsx
+      - yaml
 
   '@floating-ui/core@1.7.5':
     dependencies:
@@ -5954,30 +5977,6 @@ snapshots:
     dependencies:
       is-wsl: 3.1.1
       powershell-utils: 0.1.0
-
-  wxt-module-safari-xcode@0.2.2(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1):
-    dependencies:
-      zx: 8.8.5
-    optionalDependencies:
-      wxt: 0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)
-    transitivePeerDependencies:
-      - '@types/node'
-      - '@vitejs/devtools'
-      - canvas
-      - eslint
-      - jiti
-      - less
-      - oxc-parser
-      - rolldown
-      - rollup
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - yaml
 
   wxt@0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1):
     dependencies:

@@ -55,6 +55,7 @@ Model: openai/gpt-4.1-mini
 - No personal data collection
 - API keys stored locally in browser
 - Text only sent to configured translation service
+- At most one anonymous daily usage ping (install count and version only) — see [PRIVACY.md](PRIVACY.md)
 
 ## Installation
 

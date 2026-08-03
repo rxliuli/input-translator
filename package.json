@@ -18,6 +18,7 @@
     "init-project": "vite-node lib/build/init.ts"
   },
   "dependencies": {
+    "@extport/sdk": "^0.0.9",
     "@tailwindcss/vite": "^4.3.0",
     "@webext-core/messaging": "^3.0.1",
     "class-variance-authority": "^0.7.1",
@@ -38,7 +39,7 @@
     "type-fest": "^5.6.0"
   },
   "devDependencies": {
-    "@extport/wxt": "^0.0.3",
+    "@extport/wxt": "^0.0.7",
     "@types/node": "^25.9.1",
     "@types/nprogress": "^0.2.3",
     "@types/react": "^19.2.15",

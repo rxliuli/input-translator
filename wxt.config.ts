@@ -4,9 +4,17 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   modules: ['@wxt-dev/module-react', '@extport/wxt'],
   extport: {
-    appCategory: 'public.app-category.productivity',
-    bundleIdentifier: 'com.rxliuli.Input-Translator',
-    developmentTeam: 'N2X78TUUFG',
+    extension: 'ext_6VJwi5sSNN4Rl7awTTKs',
+    safari: {
+      appCategory: 'public.app-category.productivity',
+      bundleIdentifier: 'com.rxliuli.Input-Translator',
+      developmentTeam: 'N2X78TUUFG',
+      issuerId: '48f39427-c063-4e33-98d2-31de80aad0be',
+      keyId: '8N27UWG9RG',
+    },
+    // Daily anonymous usage ping + the Firefox data-collection declaration,
+    // injected by @extport/wxt — see PRIVACY.md "Anonymous Usage Statistics".
+    analytics: true,
   },
   vite: () => ({
     plugins: [tailwindcss()],

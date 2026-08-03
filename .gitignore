@@ -27,3 +27,6 @@ web-ext.config.ts
 *.njsproj
 *.sln
 *.sw?
+
+# synced by @extport/wxt from wxt.config.ts
+extport.config.json

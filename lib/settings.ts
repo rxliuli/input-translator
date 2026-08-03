@@ -2,7 +2,7 @@ import { OptionalKeysOf } from 'type-fest'
 
 export interface Settings {
   to?: string
-  engine?: 'microsoft' | 'google' | 'openai'
+  engine?: 'google' | 'microsoft' | 'openai'
   enableTripleSpace?: boolean
 
   apiKey?: string
@@ -25,7 +25,7 @@ Translate to {to} (output translation only):
 export function getDefaultSettings(): Pick<Settings, OptionalKeysOf<Settings>> {
   return {
     to: 'en',
-    engine: 'microsoft',
+    engine: 'google',
     enableTripleSpace: true,
     baseUrl: 'https://api.openai.com/v1',
     prompt: Prompt,

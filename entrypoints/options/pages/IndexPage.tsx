@@ -90,8 +90,8 @@ export function IndexPage() {
               handleChange({ engine: e.target.value as Settings['engine'] })
             }
           >
-            <NativeSelectOption value="microsoft">Microsoft</NativeSelectOption>
             <NativeSelectOption value="google">Google</NativeSelectOption>
+            <NativeSelectOption value="microsoft">Microsoft</NativeSelectOption>
             <NativeSelectOption value="openai">OpenAI</NativeSelectOption>
           </NativeSelect>
         </div>

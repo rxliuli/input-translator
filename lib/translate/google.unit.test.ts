@@ -74,6 +74,51 @@ describe('translateGoogle', () => {
     expect(await google.translate('Hello', { to: 'zh' })).toBe('你好')
   })
 
+  it('translates each line as its own batch item to preserve line structure', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => [['第一行', '第二行'], ['en', 'en']],
+    })
+
+    const { google } = await import('./google')
+    const result = await google.translate('First line\nSecond line', {
+      to: 'zh',
+    })
+
+    expect(result).toBe('第一行\n第二行')
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(body[0][0]).toEqual(['First line', 'Second line'])
+  })
+
+  it('preserves empty lines without sending them to the API', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => [['第一段', '第二段'], ['en', 'en']],
+    })
+
+    const { google } = await import('./google')
+    const result = await google.translate('Paragraph one\n\nParagraph two', {
+      to: 'zh',
+    })
+
+    expect(result).toBe('第一段\n\n第二段')
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+    expect(body[0][0]).toEqual(['Paragraph one', 'Paragraph two'])
+  })
+
+  it('returns whitespace-only text unchanged without calling the API', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { google } = await import('./google')
+    expect(await google.translate('\n \n', { to: 'zh' })).toBe('\n \n')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
   it('throws on a non-ok response', async () => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)

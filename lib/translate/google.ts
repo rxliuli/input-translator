@@ -68,6 +68,22 @@ export async function translateGoogle(
 export const google: Translator = {
   name: 'google',
   async translate(text, options) {
-    return (await translateGoogle([text], options.to)).texts[0]
+    // translateHtml has HTML whitespace semantics: newlines inside a single
+    // string are collapsed and the lines get merged into one sentence.
+    // Translate each line as its own batch item to preserve line structure.
+    const lines = text.split('\n')
+    const indexed = lines
+      .map((line, i) => ({ line, i }))
+      .filter(({ line }) => line.trim() !== '')
+    if (indexed.length === 0) return text
+    const result = await translateGoogle(
+      indexed.map(({ line }) => line),
+      options.to,
+    )
+    const out = [...lines]
+    indexed.forEach(({ i }, j) => {
+      out[i] = result.texts[j]
+    })
+    return out.join('\n')
   },
 }

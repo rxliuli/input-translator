@@ -70,8 +70,8 @@ importers:
         version: 5.6.0
     devDependencies:
       '@extport/wxt':
-        specifier: ^0.0.7
-        version: 0.0.7(@extport/sdk@0.0.9(react@19.2.6))(wxt@0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1))
+        specifier: ^0.0.9
+        version: 0.0.9(@extport/sdk@0.0.9(react@19.2.6))(wxt@0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1))
       '@types/node':
         specifier: ^25.9.1
         version: 25.9.1
@@ -362,8 +362,8 @@ packages:
       react:
         optional: true
 
-  '@extport/wxt@0.0.7':
-    resolution: {integrity: sha512-lm9uTYIPsn7Kc+5kw9/CLuu1hiPXjIO+Eg7OslkeLRqdeNB2/YloJjbPUg1OfHJmxxOQQo5log45+EiDrAANrg==}
+  '@extport/wxt@0.0.9':
+    resolution: {integrity: sha512-Ce6Iz+itjeZ64D2UgVbdqtBEHaQtE3ENTDh8xnTDcYj3JNHIH+uY1YiSowfmJZIw2tCi713ESMeKyOCK5EvYSA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@extport/sdk': '>=0.0.5'
@@ -3315,7 +3315,7 @@ snapshots:
     optionalDependencies:
       react: 19.2.6
 
-  '@extport/wxt@0.0.7(@extport/sdk@0.0.9(react@19.2.6))(wxt@0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1))':
+  '@extport/wxt@0.0.9(@extport/sdk@0.0.9(react@19.2.6))(wxt@0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1))':
     dependencies:
       wxt: 0.20.26(@types/node@25.9.1)(jiti@2.7.0)(rolldown@1.0.2)(rollup@4.41.1)
     optionalDependencies:

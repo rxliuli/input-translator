@@ -1,76 +1,67 @@
 import { TranslationResult, Translator } from './types'
 
-const NAMED_ENTITIES: Record<string, string> = {
-  amp: '&',
-  lt: '<',
-  gt: '>',
-  quot: '"',
-  apos: "'",
-  nbsp: '\u00a0',
-}
+// Same endpoint translate.google.com's "gtx" client uses. No API key or token
+// needed. `dt=t` asks for the translation segments, `dt=qca` enables Google's
+// query-correction step, which is what makes the website handle romanized
+// input (e.g. Bengali "Tumi ki koro" -> "তুমি কি করো", pinyin "ni hao" ->
+// "你好") before translating. The Translate Element backend
+// (translate-pa.googleapis.com/v1/translateHtml) lacks that step and
+// mistranslates such input, see google.unit.test.ts.
+const GOOGLE_TRANSLATE_URL =
+  'https://translate.googleapis.com/translate_a/single'
 
-export function decodeHTML(input: string): string {
-  return input.replace(
-    /&(#[xX][0-9a-fA-F]+|#[0-9]+|[a-zA-Z][a-zA-Z0-9]*);/g,
-    (match, body: string) => {
-      if (body[0] === '#') {
-        const code =
-          body[1] === 'x' || body[1] === 'X'
-            ? parseInt(body.slice(2), 16)
-            : parseInt(body.slice(1), 10)
-        if (!Number.isFinite(code) || code < 0 || code > 0x10ffff) return match
-        try {
-          return String.fromCodePoint(code)
-        } catch {
-          return match
-        }
-      }
-      return NAMED_ENTITIES[body] ?? match
+async function translateGoogleOne(
+  text: string,
+  targetLang: string,
+): Promise<{ text: string; detectedLang?: string }> {
+  const query = new URLSearchParams({
+    client: 'gtx',
+    sl: 'auto',
+    tl: targetLang,
+    ie: 'UTF-8',
+    oe: 'UTF-8',
+  })
+  query.append('dt', 't')
+  query.append('dt', 'qca')
+  // `q` goes in the body so long inputs don't hit URL length limits.
+  const resp = await fetch(`${GOOGLE_TRANSLATE_URL}?${query}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
-  )
-}
+    body: new URLSearchParams({ q: text }).toString(),
+  })
 
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
+  if (!resp.ok) throw new Error(`Google translate failed: ${resp.status}`)
 
-const GOOGLE_TRANSLATE_HTML_KEY = 'AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520'
+  const data = await resp.json()
+  // data[0]: [[translatedSegment, sourceSegment, ...], ...]; data[2]: detected language
+  const segments = (data[0] ?? []) as (string | null)[][]
+  return {
+    text: segments.map((s) => s?.[0] ?? '').join(''),
+    detectedLang: typeof data[2] === 'string' ? data[2] : undefined,
+  }
+}
 
 export async function translateGoogle(
   texts: string[],
   targetLang: string,
 ): Promise<TranslationResult> {
-  const escaped = texts.map(escapeHtml)
-  const resp = await fetch(
-    'https://translate-pa.googleapis.com/v1/translateHtml',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json+protobuf',
-        'X-Goog-API-Key': GOOGLE_TRANSLATE_HTML_KEY,
-      },
-      body: JSON.stringify([[escaped, 'auto', targetLang], 'te_lib']),
-    },
+  const results = await Promise.all(
+    texts.map((text) => translateGoogleOne(text, targetLang)),
   )
-
-  if (!resp.ok) throw new Error(`Google translate failed: ${resp.status}`)
-
-  const data = await resp.json()
-  const translated = data[0] as string[]
-  const detectedLangs = data[1] as string[] | undefined
-
   return {
-    texts: translated.map((t) => decodeHTML(t)),
-    detectedLang: detectedLangs?.[0],
+    texts: results.map((r) => r.text),
+    detectedLang: results[0]?.detectedLang,
   }
 }
 
 export const google: Translator = {
   name: 'google',
   async translate(text, options) {
-    // translateHtml has HTML whitespace semantics: newlines inside a single
-    // string are collapsed and the lines get merged into one sentence.
-    // Translate each line as its own batch item to preserve line structure.
+    // Lines without terminal punctuation get merged into one sentence by the
+    // API ("你好\n世界" -> "Hello World"), so translate each line separately
+    // to preserve line structure.
     const lines = text.split('\n')
     const indexed = lines
       .map((line, i) => ({ line, i }))

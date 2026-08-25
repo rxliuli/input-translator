@@ -3,6 +3,8 @@ import { google } from '../lib/translate/google'
 import { getMergedSettings, setSyncSettings } from '@/lib/settings'
 import { openai } from '@/lib/translate/openai'
 import { microsoft } from '@/lib/translate/microsoft'
+import { imp, humanizeImpError } from '@/lib/translate/imp'
+import { IMP_API_BASE, IMP_ORIGIN } from '@/lib/imp'
 import { langs, defaultPopularLanguages } from '@/lib/langs'
 
 const MENU_PREFIX = 'translate-lang-'
@@ -130,18 +132,102 @@ export default defineBackground(() => {
     const client =
       settings.engine === 'openai'
         ? openai
-        : settings.engine === 'google'
-          ? google
-          : microsoft
+        : settings.engine === 'imp'
+          ? imp
+          : settings.engine === 'google'
+            ? google
+            : microsoft
     try {
-      const result = await client.translate(ev.data, { to: settings.to! })
-      if (result) {
-        await updateRecentLanguages(settings.to!)
-      }
-      return result
+      const text = await client.translate(ev.data, { to: settings.to! })
+      await updateRecentLanguages(settings.to!)
+      return { ok: true as const, text }
     } catch (error) {
       console.error('translateText', error)
-      return null
+      return {
+        ok: false as const,
+        error:
+          settings.engine === 'imp'
+            ? humanizeImpError(error)
+            : error instanceof Error
+              ? error.message
+              : 'Failed to translate',
+      }
+    }
+  })
+
+  // Exchanges the one-time code the imp-connect content script read off the
+  // success page's meta tag for a persistent Imp Credits API key. Only the
+  // api key is persisted; the service origin/API base are constants
+  // (lib/imp.ts) and the model is server-authoritative, so neither baseUrl
+  // nor model is stored.
+  messaging.onMessage('impConnect', async (message) => {
+    const code = message.data
+    try {
+      const res = await fetch(`${IMP_ORIGIN}/api/connect/exchange`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      })
+      const body = await res.json().catch(() => null)
+      if (!res.ok) {
+        const error =
+          (body as { error?: string } | null)?.error ??
+          `Connect failed with status ${res.status}`
+        return { ok: false, error }
+      }
+      const { apiKey } = body as { apiKey: string }
+      await setSyncSettings({ engine: 'imp', imp: { apiKey } })
+      return { ok: true }
+    } catch (err) {
+      console.error(
+        'impConnect',
+        err instanceof Error ? err.message : err,
+      )
+      return {
+        ok: false,
+        error: 'Could not reach the Imp Credits service — please retry.',
+      }
+    }
+  })
+
+  // Zero-cost status check for the options page: the stored Imp key is valid
+  // iff GET {baseUrl}/me accepts it. The session cookie is excluded via
+  // credentials: 'omit' — the check must reflect the KEY only, and /me
+  // accepts session-OR-key, so a logged-in user's cookie would otherwise
+  // make a revoked key still return 200 while real requests 401.
+  messaging.onMessage('checkConnection', async () => {
+    const settings = await getMergedSettings()
+    const apiKey = settings.imp?.apiKey
+    if (settings.engine !== 'imp' || !apiKey) {
+      return { ok: false as const, error: 'not connected' }
+    }
+    try {
+      const res = await fetch(`${IMP_API_BASE}/me`, {
+        credentials: 'omit',
+        headers: { authorization: `Bearer ${apiKey}` },
+      })
+      if (res.status === 401)
+        return { ok: false as const, error: 'unauthorized' }
+      const contentType = res.headers.get('content-type') ?? ''
+      if (!contentType.includes('application/json')) {
+        return { ok: false as const, error: 'unexpected endpoint response' }
+      }
+      const body = (await res.json().catch(() => null)) as {
+        email?: unknown
+      } | null
+      if (typeof body?.email !== 'string') {
+        return { ok: false as const, error: 'unexpected endpoint response' }
+      }
+      return { ok: true as const }
+    } catch (err) {
+      console.error(
+        'checkConnection',
+        err instanceof Error ? err.message : err,
+      )
+      return {
+        ok: false as const,
+        error: err instanceof Error ? err.message : 'network error',
+      }
     }
   })
 

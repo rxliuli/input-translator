@@ -2,13 +2,21 @@ import { OptionalKeysOf } from 'type-fest'
 
 export interface Settings {
   to?: string
-  engine?: 'google' | 'microsoft' | 'openai'
+  engine?: 'google' | 'microsoft' | 'openai' | 'imp'
   enableTripleSpace?: boolean
 
   apiKey?: string
   model?: string
   baseUrl?: string
   prompt?: string
+
+  // Imp Credits connection, filled in automatically by the connect flow.
+  // Only the api key is persisted — the service's origin and API base are
+  // constants (lib/imp.ts), and the model is server-authoritative so it is
+  // never stored (lib/translate/imp.ts never sends one).
+  imp?: {
+    apiKey: string
+  }
 
   recentLanguages?: string[]
 }
@@ -43,6 +51,7 @@ export async function getSettings(): Promise<Settings> {
       'prompt',
       'model',
       'apiKey',
+      'imp',
       'recentLanguages',
     ])),
   }

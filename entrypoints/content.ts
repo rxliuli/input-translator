@@ -52,14 +52,15 @@ export default defineContentScript({
           return
         }
         console.debug('Translating text:', JSON.stringify(textToTranslate))
-        const translatedText = await messaging.sendMessage(
+        const translation = await messaging.sendMessage(
           'translateText',
           textToTranslate,
         )
-        if (!translatedText) {
-          alert('Failed to translate')
+        if (!translation.ok) {
+          alert(translation.error || 'Failed to translate')
           return
         }
+        const translatedText = translation.text
         let result = false
         if (selection.hasSelection()) {
           result = await selection.replaceSelection(translatedText)

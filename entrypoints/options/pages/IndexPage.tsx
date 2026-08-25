@@ -13,6 +13,9 @@ import {
   setSyncSettings,
   Settings,
 } from '@/lib/settings'
+import { messaging } from '@/lib/messaging'
+import { IMP_CONNECT_URL } from '@/lib/imp'
+import { cn } from '@/lib/utils'
 import { FaDiscord } from 'react-icons/fa'
 import { ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -30,6 +33,21 @@ export function IndexPage() {
         setSettings(settings)
       }
     })()
+  }, [])
+
+  // Reload settings whenever storage changes so the options page picks up a
+  // new Imp key the connect flow writes in the background (engine + imp)
+  // without a manual refresh — the Connected badge re-renders and re-checks
+  // because it depends on the key.
+  useEffect(() => {
+    const listener = () => {
+      ;(async () => {
+        const settings = await getSettings()
+        if (settings) setSettings(settings)
+      })()
+    }
+    browser.storage.onChanged.addListener(listener)
+    return () => browser.storage.onChanged.removeListener(listener)
   }, [])
 
   async function handleChange(value: Partial<Settings>) {
@@ -92,6 +110,7 @@ export function IndexPage() {
           >
             <NativeSelectOption value="google">Google</NativeSelectOption>
             <NativeSelectOption value="microsoft">Microsoft</NativeSelectOption>
+            <NativeSelectOption value="imp">Imp Credits</NativeSelectOption>
             <NativeSelectOption value="openai">OpenAI</NativeSelectOption>
           </NativeSelect>
         </div>
@@ -99,6 +118,8 @@ export function IndexPage() {
         {settings.engine === 'openai' && (
           <OpenAISettings settings={settings} onChange={handleChange} />
         )}
+
+        {settings.engine === 'imp' && <ImpCreditsSection settings={settings} />}
 
         <div className="grid gap-2">
           <Label htmlFor="triple-space">Triple-Space to Translate</Label>
@@ -152,6 +173,81 @@ function OpenAISettings(props: {
           onChange={(e) => onChange({ prompt: e.target.value })}
         />
       </div>
+    </div>
+  )
+}
+
+function ImpCreditsSection({ settings }: { settings: Settings }) {
+  const connected = !!settings.imp?.apiKey
+  const [connStatus, setConnStatus] = useState<
+    'idle' | 'checking' | 'connected' | 'disconnected' | 'unknown'
+  >('idle')
+
+  // Auto-verify the stored Imp key when this section shows (and whenever the
+  // key changes), so the Connected badge reflects whether the key is still
+  // valid rather than just "we have a stored key". Never calls the model —
+  // see background.ts's checkConnection handler.
+  useEffect(() => {
+    if (!connected) {
+      setConnStatus('idle')
+      return
+    }
+    let cancelled = false
+    setConnStatus('checking')
+    ;(async () => {
+      let next: 'connected' | 'disconnected' | 'unknown'
+      try {
+        const result = await messaging.sendMessage('checkConnection')
+        next = result.ok ? 'connected' : 'disconnected'
+      } catch {
+        next = 'unknown'
+      }
+      if (!cancelled) setConnStatus(next)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [connected, settings.imp?.apiKey])
+
+  function connect() {
+    browser.tabs.create({ url: IMP_CONNECT_URL })
+  }
+
+  const statusInfo = {
+    idle: { dot: 'bg-muted', label: 'Not connected' },
+    checking: {
+      dot: 'bg-muted animate-pulse',
+      label: 'Checking connection…',
+    },
+    connected: { dot: 'bg-green-500', label: 'Connected to Imp Credits' },
+    disconnected: {
+      dot: 'bg-red-500',
+      label: 'Connection lost — reconnect',
+    },
+    unknown: { dot: 'bg-amber-500', label: "Couldn't verify connection" },
+  }[connStatus]
+
+  return (
+    <div className="grid gap-4">
+      {connected ? (
+        <div className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2 text-sm">
+            <span
+              className={cn('size-2 shrink-0 rounded-full', statusInfo.dot)}
+            />
+            <span className="truncate">{statusInfo.label}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="secondary" onClick={connect}>
+              Reconnect
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Button className="w-full" onClick={connect}>
+          Connect Imp Credits
+        </Button>
+      )}
     </div>
   )
 }

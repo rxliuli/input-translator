@@ -2,7 +2,7 @@
   "name": "input-translator",
   "description": "manifest.json description",
   "private": true,
-  "version": "0.7.2",
+  "version": "0.7.3",
   "type": "module",
   "scripts": {
     "dev": "wxt",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@extport/sdk": "^0.0.9",
+    "@rxliuli/imp-credits-sdk": "^0.0.1",
     "@tailwindcss/vite": "^4.3.0",
     "@webext-core/messaging": "^3.0.1",
     "class-variance-authority": "^0.7.1",

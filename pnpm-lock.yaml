@@ -14,6 +14,9 @@ importers:
       '@extport/sdk':
         specifier: ^0.0.9
         version: 0.0.9(react@19.2.6)
+      '@rxliuli/imp-credits-sdk':
+        specifier: ^0.0.1
+        version: 0.0.1
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@8.0.14(@types/node@25.9.1)(esbuild@0.27.7)(jiti@2.7.0))
@@ -1330,6 +1333,9 @@ packages:
     resolution: {integrity: sha512-Wq2zpapRYLfi4aKxf2Xff0tN+7slj2d4R87WEzqw7ZLsVvO5zwYCIuEGSZYiK41+GlwUo1HiR+GdkLEJnCKTCw==}
     cpu: [x64]
     os: [win32]
+
+  '@rxliuli/imp-credits-sdk@0.0.1':
+    resolution: {integrity: sha512-Gc6iChz+a0P9ibGmTrlGHMlL6ydk1vPtZVyCkNv4nonVT5Nx/bUiokXmRSrEv21lLNk09gdxnloNYjv0o1b2HA==}
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
@@ -4253,6 +4259,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.41.1':
     optional: true
+
+  '@rxliuli/imp-credits-sdk@0.0.1': {}
 
   '@standard-schema/spec@1.1.0': {}
 

@@ -1,3 +1,4 @@
+import { checkConnection, exchangeCode, humanizeError } from '@rxliuli/imp-credits-sdk'
 import { messaging } from '@/lib/messaging'
 import { google } from '../lib/translate/google'
 import { getMergedSettings, setSyncSettings } from '@/lib/settings'
@@ -163,19 +164,9 @@ export default defineBackground(() => {
   messaging.onMessage('impConnect', async (message) => {
     const code = message.data
     try {
-      const res = await fetch(`${IMP_ORIGIN}/api/connect/exchange`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      })
-      const body = await res.json().catch(() => null)
-      if (!res.ok) {
-        const error =
-          (body as { error?: string } | null)?.error ??
-          `Connect failed with status ${res.status}`
-        return { ok: false, error }
-      }
-      const { apiKey } = body as { apiKey: string }
+      // The SDK exchanges the one-time code for { apiKey, baseUrl, model };
+      // only the api key is persisted (base/model are derived from IMP_ORIGIN).
+      const { apiKey } = await exchangeCode({ code, origin: IMP_ORIGIN })
       await setSyncSettings({ engine: 'imp', imp: { apiKey } })
       return { ok: true }
     } catch (err) {
@@ -183,10 +174,9 @@ export default defineBackground(() => {
         'impConnect',
         err instanceof Error ? err.message : err,
       )
-      return {
-        ok: false,
-        error: 'Could not reach the Imp Credits service — please retry.',
-      }
+      // Humanize in `imp` mode so a 400 (invalid/already-used code) and a
+      // network error both become something the banner can say.
+      return { ok: false, error: humanizeError(err, 'imp') }
     }
   })
 
@@ -202,23 +192,10 @@ export default defineBackground(() => {
       return { ok: false as const, error: 'not connected' }
     }
     try {
-      const res = await fetch(`${IMP_API_BASE}/me`, {
-        credentials: 'omit',
-        headers: { authorization: `Bearer ${apiKey}` },
-      })
-      if (res.status === 401)
-        return { ok: false as const, error: 'unauthorized' }
-      const contentType = res.headers.get('content-type') ?? ''
-      if (!contentType.includes('application/json')) {
-        return { ok: false as const, error: 'unexpected endpoint response' }
-      }
-      const body = (await res.json().catch(() => null)) as {
-        email?: unknown
-      } | null
-      if (typeof body?.email !== 'string') {
-        return { ok: false as const, error: 'unexpected endpoint response' }
-      }
-      return { ok: true as const }
+      // The SDK GETs {baseUrl}/me with credentials:'omit' — the status check
+      // must reflect the KEY only, not a logged-in session cookie (which
+      // would make a revoked key still return 200).
+      return await checkConnection({ baseUrl: IMP_API_BASE, apiKey })
     } catch (err) {
       console.error(
         'checkConnection',

@@ -64,6 +64,8 @@ export default defineConfig({
     }
     if (env.browser === 'safari') {
       manifest.name = 'Input Translator'
+      manifest.description =
+        'Translate text inside any input box in place with Space 3× or Alt+T. Free Google/Microsoft or AI.'
     }
     return manifest
   },

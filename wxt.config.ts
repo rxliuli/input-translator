@@ -25,8 +25,9 @@ export default defineConfig({
   manifestVersion: 3,
   manifest: (env) => {
     const manifest: UserManifest = {
-      name: 'Input Translator',
-      description: 'Translate your input text with AI.',
+      name: 'Input Translator: AI Translate While Typing',
+      description:
+        'Translate text inside any input box in place. Press Space 3× or Alt+T on Discord, Slack & email — free Google/Microsoft or AI.',
       permissions: ['contextMenus', 'storage'],
       host_permissions: ['<all_urls>'],
       author: {
@@ -49,13 +50,12 @@ export default defineConfig({
           description: 'Translate your input text with AI.',
         },
       },
-      homepage_url: 'https://rxliuli.com/project/input-translator',
+      homepage_url: 'https://store.rxliuli.com/extensions/input-translator/',
     }
     if (env.browser === 'firefox') {
       manifest.browser_specific_settings = {
         gecko: {
-          id:
-            manifest.name!.toLowerCase().replaceAll(' ', '-') + '@rxliuli.com',
+          id: 'input-translator@rxliuli.com',
         },
       }
       // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/author

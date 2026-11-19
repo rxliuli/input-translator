@@ -62,6 +62,9 @@ export default defineConfig({
       // @ts-expect-error
       manifest.author = 'rxliuli'
     }
+    if (env.browser === 'safari') {
+      manifest.name = 'Input Translator'
+    }
     return manifest
   },
   webExt: {
